@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Alejandra Plazola</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on Alejandra Plazola</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 04 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Perros</title>
+      <link>/post/2020/12/04/perros/</link>
+      <pubDate>Fri, 04 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2020/12/04/perros/</guid>
+      <description>Link to project 1
+Link to google
+Hola! Bienviedenos mi primer entrada en el blog. En este entrada puedes hallar un enlace sobre mi primer projecto de el clase Biologia Computacional. Los hice sobre perros porque era un topico que me interesaba mas y tambien en este tiempo tenge 3 perros; 2 son perros nuevos a la familia. Ojala que les gustan y lo toman muy interestante. Gracias~</description>
+    </item>
+    
+  </channel>
+</rss>

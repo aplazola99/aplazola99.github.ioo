@@ -1,0 +1,272 @@
+---
+title: 'Project 2.'
+author: "Alejandra Plazola and Map5667"
+date: "November 25, 2020"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+  word_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+# Modeling
+## Introduction
+This is the 'College' dataset, in which it is a dataset that 
+containing information abbout college majors across the U.S and their median incomes. This dataset is from the American Community Survey 2010-2012 Public Use Microdata Series
+https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-10-16 
+https://github.com/rfordatascience/tidytuesday. It has 21 variables and 172 observations. The variable names it contains that are Rank, Major_code, Major, Major_category, Total, Sample_size, Men, Women, ShareWomen, Employed, Full_time, Part_time, Full_time_year_round, Unemployed, Unemployment_rate, Media, P25th, P75th, College_jobs, Non_college_jobs, and Low_wage_jobs.
+
+
+```{r}
+library(mvtnorm); library(ggplot2);library(dplyr); library(tidyverse); library(lmtest);library(glmnet)
+College <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-10-16/recent-grads.csv")
+cg<-College%>%na.omit()
+College%>%group_by(Major_category)%>%count()
+#Subsetting data to only have 5 observations for Major_Category
+College<-College %>% filter(Major_category != "Arts" &
+              Major_category != "Interdisciplinary" &
+              Major_category != "Law & Public Policy"&
+              Major_category != "Industrial Arts & Consumer Services"&
+              Major_category != "Communications & Journalism"&
+              Major_category!="Social Science"&
+              Major_category!="Psychology & Social Work"&
+              Major_category!="Biology & Life Science"&
+              Major_category!="Agriculture & Natural Resources"&
+            Major_category!="Health"&
+            Major_category!="Physical Sciences"
+            )
+```
+
+## MANOVA
+```{r}
+ggplot(College, aes(x = Employed, y = Median)) +geom_point(alpha = .1) + geom_density_2d(h=2) +coord_fixed() + facet_wrap(~Major_category)
+MANC<-manova(cbind(Employed,Median)~Major_category, data=College)
+summary(MANC)
+summary.aov(MANC)
+College%>%group_by(Major_category)%>%summarize(mean(Employed),mean(Median))
+
+pairwise.t.test(College$Employed, College$Major_category, p.adj="none")
+pairwise.t.test(College$Median, College$Major_category, p.adj="none")
+
+#Probability of at least one type I error
+1-(0.95^23)
+#Bonferroni Correction
+.05/23
+```
+A one-way MANOVA was conducted to determine the effect of the Major_Category type (Engineering, Business, Computers&Mathematics, Education, and Humanities&Arts) on two dependent variables (Median and Employed). Based on the MANOVA, there was a significiant difference found between the 5 major categories, Pillai trace=0.77805,pseudo F (4, 158) = 12.575, p < 0.0001. Univariate ANOVAs for each dependent variable were conducted as follow-up tests to the MANOVA, using the Bonferroni method for controlling Type I error rates for multiple comparisons.The univariate ANOVAs for Employed and Media were also significant, F (4, 79) = 5.0807, p < .005, and F (2, 79) = 28.774, p < .0001, respectively.Post hoc analysis was performed conducting pairwise comparisons to determine which Major_Category differed in Employed and Median. All major categories differ based on both Employment and Median income.
+
+There are several assumptions including multivariate normality, equal covariance between two dependent variables, linear relationships among variables, no extreme univariate or multivariate outliers, and no multicollinearity. It is likely that not all assumptions are met based on the density plot for each group as I can see some outliers for some.
+
+I performed 1 MANOVA, 2 ANOVAS, and 20 t tests so the bonferroni significance level is α = .05/20 = .002173913. The probability of at least one type I error, unadjusted, is 0.6926431. 
+All three Species were found to differ significantly from each other in terms of sepal length and petal width after adjusting for multiple comparisons (bonferroni α = .05/9 = .0056). Both Median and Employed are still significant after finding bonferroni corrected significance level.
+
+## Randomization Test
+```{r}
+set.seed(348)
+summary(aov(Median~Major_category, data=College))
+obs_F<-28.77 #this is the observed F-statistic
+Fs<-replicate(5000,{ #do everything in curly braces 5000 times and save the output
+ new<-College%>%mutate(Med=sample(Median)) #randomly permute response variable 
+ #compute the F-statistic by hand
+ SSW<- new%>%group_by(Major_category)%>%summarize(SSW=sum((Med-mean(Med))^2))%>%
+       summarize(sum(SSW))%>%pull
+ SSB<- new%>%mutate(mean=mean(Med))%>%group_by(Major_category)%>%mutate(groupmean=mean(Med))%>%
+       summarize(SSB=sum((mean-groupmean)^2))%>%summarize(sum(SSB))%>%pull
+ (SSB/2)/(SSW/57) #compute F statistic (num df = K-1 = 3-1, denom df = N-K = 60-3)
+})
+hist(Fs, prob=T); abline(v=obs_F, col="red", add=T)
+mean(Fs>obs_F)
+```
+The null hypothesis is that the true mean of Median income is the same for all 5 major category groups(Engineering, Computers&Mathematics,Education, Humanities&Arts, and Business). 
+The alternative hypothesis is that at least of the means of Median incaome for all 5 major category groups differ.
+I conducted an ANOVA/Fstat test and the p-value for mean(Fs>obs_F) is 0. This means none of our 5000 F stats generated under the null hypothesis were bigger than our actual F stat of 28.77 and means that it definitely rejected the null hypothesis and that major category groups do differ. 
+
+## Linear Regression Model
+```{r}
+College$M<-College$Men-mean(College$Men)
+
+College$W<-College$Women-mean(College$Women)
+
+  fit1<-lm(Median~W+M, data=College)
+summary(fit1)
+ggplot(College, aes(y=M,x=W, color=Median))+geom_point()+geom_smooth(method="lm",se=FALSE)
+qqnorm(College$M)
+qqnorm(College$W)
+shapiro.test(head(College$M))
+shapiro.test(head(College$W))
+bptest(fit1)
+library(sandwich)
+coeftest(fit1, vcov = vcovHC(fit1)) 
+summary(fit1)$r.sq
+fit2<-lm(Median~Men, data = College) #main effects of lat
+summary(fit2)
+fit3<-lm(Median~Women, data= College)
+summary(fit3)
+#install.packages("interactions")
+library(interactions)
+interact_plot(fit1,M,W) #interaction plot 
+```
+For every one unit increase in Median income, the total number of Women decreases by .01933 units and the total number of Men increases by .01414 units. The linearity assumption is violated based on the ggplot. There does not seem to be normality based on the q-q plots. From the Shapiro-Wilk, the p-value < 0.05 implying that the distribution of the data are significantly different from normal distribution; meaning we cannot assume normalitiy. Based on the Breusch-Pagan test, the p-Value > 0.05 indicates that the null hypothesis can rejected and therefore heterscedasticity does exists. With the robust standard errors, the t-values increases for the intercept and M, the t-values for W decreases, the p-values for Intercept and M decreased, and the p-values for W increased. The proportion of the variation in the outcome explained by this model is 0.1321102.
+
+## Bootstrapped Standard Error
+```{r}
+set.seed(348)
+fit4<-lm(Median~Men*Women, data=College)
+boot_sd<-College[sample(nrow(College),replace=T),]
+samp_distn<-replicate(1000,{
+  boot_sd<-College[sample(nrow(College),replace=T),]
+  fit5<-lm(Median~Men*Women, data=boot_sd)
+  coef(fit5)
+})
+samp_distn%>%t%>%as.data.frame%>%summarize_all(sd)
+#Uncorrected SEs
+summary(fit4)
+#Corrected SEs
+coeftest(fit4, vcov=vcovHC(fit4))
+```
+The SEs for the uncorrected SEs for the Intercept and Women seem to be smaller than the corrected SEs. The SEs for the uncorrected SEs for Men and Men:Women tend to be bigger than corrected SEs.
+The p-values for the uncorrected SEs for intercept, Men, Men:Women seem to be lower than the p-values for the corrected SEs. The p-value for Women for the uncorrected SEs seem to be higher than the p-value for the corrected SE.
+
+## Logistic Regression Model
+```{r}
+College_new <- College %>%mutate(Major_cat = if_else(Major_category == "Engineering", 'Eng', 'Other'))
+College_new$y<-ifelse(College_new$Major_cat=="Eng",1,0)
+fit6<-glm(y~P25th+P75th, data=College_new, family="binomial")
+coeftest(fit6)
+exp(coef(fit6))
+College_new$probs<-predict(fit6, type="response")
+table(predict=as.numeric(College_new$probs>0.5),truth=College_new$y)%>%addmargins()
+#Sensitivity(TPR)
+24/29
+#Specificity(TNR)
+48/55
+#Precision(PPV)
+24/31
+## GIVE IT PREDICTED PROBS AND TRUTH LABELS (0/1), RETURNS VARIOUS DIAGNOSTICS
+
+class_diag <- function(probs,truth){
+#CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
+
+if(is.character(truth)==TRUE) truth<-as.factor(truth)
+if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+
+tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),factor(truth, levels=c(0,1)))
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+f1=2*(sens*ppv)/(sens+ppv)
+
+#CALCULATE EXACT AUC
+ord<-order(probs, decreasing=TRUE)
+probs <- probs[ord]; truth <- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+n <- length(TPR)
+auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,f1,auc)
+}
+probs1 <- predict(fit6, type = "response")
+class_diag(probs1, College_new$y)
+
+College_new$logit<-predict(fit6, type="link")
+
+College_new%>%ggplot()+geom_density(aes(logit,color=Major_cat,fill=Major_cat), alpha=.4)+
+  theme(legend.position=c(.83,.83))+geom_vline(xintercept=0)+xlab("logit (log-odds)")+
+  geom_rug(aes(logit,color=Major_cat))
+
+library(plotROC)
+#ROCCurve
+ROCplot<-ggplot(College_new)+geom_roc(aes(d=y,m=probs), n.cuts=0)+
+  geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2)
+ROCplot
+#AUC
+calc_auc(ROCplot)
+```
+The logistic regression model tells us the odds of being an Engineering major for when p25th income=0 and p75th income=0 is 2.561903e-05. Controlling for Engineering Major and P75th income, for every additional unit of P25th the odds of it being an Engineering major it increases by 1.000116. Controlling for Engineering and P25th income, the odds of it an Engineering major to increase income is by 1.000106. 
+
+The TPR/Sensitivity is 0.8275862, and the TNR/Specificity is 0.8727273: this means the model is good at predictings that the probability a major being either Engineering or other(the other 4 grouped together).The PPV/Precision is .7741935 which gives us the proportion of those majors classified as Engineering being Engineering. The accurarcy is .8571429 meaning it seems to be pretty good. The AUC found is 0.9213166, meaning the this model is "great!" at predicting between postive and negative classes.
+
+The ROC curves shows the trade-off between TPR and TNR. The AUC caclculated is 0.9213166, meaning the this model is "great!", there is no change (this an error on my part).
+
+## Logistic regression Binary
+
+```{r}
+#log regression using binary
+cn<-College_new%>%select(-c("Major","Major_category","Major_cat"))
+fit8<-glm(y~., data=cn, family='binomial')
+coeftest(fit8)
+exp(coef(fit8))
+probs2<-predict(fit8, type="response")
+class_diag(probs2, cn$y)
+summary(fit8)
+set.seed(348)
+k = 10
+data <- cn[sample(nrow(cn)), ]
+folds <- cut(seq(1:nrow(cn)), breaks = k, labels = F)
+
+diags <- NULL
+for (i in 1:k) {
+    train <- data[folds != i, ]
+    test <- data[folds == i, ]
+    truth <- test$y
+    fit <- glm(y ~ ., data = train, family = "binomial")
+    probs <- predict(fit, newdata = test, type = "response")
+    diags <- rbind(diags, class_diag(probs, truth))
+}
+
+summarize_all(diags, mean)
+
+#lasso regression
+set.seed(348)
+cn<-College_new%>%select(-c("Major","Major_category","Major_cat"))
+library(glmnet)
+data(cn)
+y<-as.matrix(cn$y)
+x<-cn%>%select(-y)%>%mutate_all(scale)%>%as.matrix
+head(x)
+cv<-cv.glmnet(x,y)
+lasso1<-glmnet(x,y,lambda=cv$lambda.1se)
+coef(lasso1)
+prob<-predict(lasso1, newx=x, type="response")
+class_diag(prob,cn$y)
+
+k=10
+data <- cn %>% sample_frac #put rows of dataset in random order
+folds <- ntile(1:nrow(data),n=10) #create fold labels
+diags<-NULL
+for(i in 1:k){
+  train <- data[folds!=i,] #create training set (all but fold i)
+  test <- data[folds==i,] #create test set (just fold i)
+  truth <- test$y #save truth labels from fold i
+  fit <- glm(y~Rank+Major_code+ ShareWomen+Median,
+             data=train, family="binomial")
+  probs <- predict(fit, newdata=test, type="response")
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+```
+The logistic regression using Binary variables acc= .9404762 meaning it is pretty much accurate at predicting, sens= 0.9655172, spec=0.9272727, ppv=0.875, and AUC=0.946395. This model is a great fit for the predicted probilities of Engineering.
+The 10-fold CV model's acc=0.7638889, sens=0.735 spec=0.7828571, ppv=0.6666667, and AUC=0.8003571. The AUC is fair and when compared to original logistic regression AUC is decreased so the out of sampling isn't good in showing the model.
+
+The variables retained are Rank, Major_code, ShareWomen, and Median. The lasso regression cv performance shows acc=0.8928571, sens=0.862069, spec=0.9090909 and ppv= 0.8333333. The AUC of the lasso regression is 0.9768025, which means it is great and when compared to past AUC it is the highest. 
+
+The out-of-sample AUC of the 10-fold CV of the lasso variables selected is 0.9580952. When comparing the AUC to the logistic regression above it is higher but lower than lasso regression cv. 
+
+
+
