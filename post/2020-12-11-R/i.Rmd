@@ -1,0 +1,15 @@
+---
+title: Using R and Python Together
+author: Alejandra Plazola
+date: '2020-12-11'
+slug: perros
+categories: []
+tags: []
+description: 'Vamos hablar sobre perros'
+---
+Hola! Bienviedenos mi primer entrada en el blog.
+    En este entrada puedes hallar un enlace sobre mi primer projecto de el clase Biologia Computacional. 
+Los hice sobre perros porque era un topico que me interesaba mas y tambien en este tiempo tenge 3 perros; 2 son perros nuevos a la familia.
+Ojala que les gustan y lo toman muy interestante.
+Gracias~
+

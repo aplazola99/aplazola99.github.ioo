@@ -6,7 +6,16 @@
     <description>Recent content on Alejandra Plazola</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Fri, 04 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 11 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Using R and Python Together</title>
+      <link>/post/2020/12/11/perros/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2020/12/11/perros/</guid>
+      <description>Hola! Bienviedenos mi primer entrada en el blog. En este entrada puedes hallar un enlace sobre mi primer projecto de el clase Biologia Computacional. Los hice sobre perros porque era un topico que me interesaba mas y tambien en este tiempo tenge 3 perros; 2 son perros nuevos a la familia. Ojala que les gustan y lo toman muy interestante. Gracias~</description>
+    </item>
+    
     <item>
       <title>Perros</title>
       <link>/post/2020/12/04/perros/</link>
@@ -19,24 +28,25 @@ Hola! Bienviedenos mi primer entrada en el blog. En este entrada puedes hallar u
     </item>
     
     <item>
+      <title>Project 2:Statiscal Modeling</title>
+      <link>/project/project2/</link>
+      <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Modeling Alejandra Plazola and Map5667
+Introduction This is the ‘College’ dataset, in which it is a dataset that containing information abbout college majors across the U.S and their median incomes. This dataset is from the American Community Survey 2010-2012 Public Use Microdata Series https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-10-16 https://github.com/rfordatascience/tidytuesday. It has 21 variables and 172 observations. The variable names it contains that are Rank, Major_code, Major, Major_category, Total, Sample_size, Men, Women, ShareWomen, Employed, Full_time, Part_time, Full_time_year_round, Unemployed, Unemployment_rate, Media, P25th, P75th, College_jobs, Non_college_jobs, and Low_wage_jobs.</description>
+    </item>
+    
+    <item>
       <title>Project 1: Exploratory Data Analysis over Dogs.</title>
       <link>/project/project1/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 18 Oct 2020 00:00:00 +0000</pubDate>
       
       <guid>/project/project1/</guid>
       <description>Alejandra Plazola and MAP5667
 Data Wrangling and Data Exploration Dog popularity, intelligence, and breed info.
-Introduction Recently, I have been into dogs and raising my pups, I did alot of background research on dog breeds before selecting which breed was the best at fiting into my lifestyle plus my past experiences of raising certain dog breeds like German Shepherds, Labs, and Rotwielers.
+Introduction Recently, I have been into dogs and raising my pups, I did quite a bit of background research on dog breeds before selecting which breed was the best at fitting into my lifestyle plus my past experiences of raising certain dog breeds like German Shepherds, Labs, and Rottweilers.
 This got me to thinking that I automatically wanted to do my project one over dog breed intelligence and comparing it to dog breed popularity.</description>
-    </item>
-    
-    <item>
-      <title>Project 2.</title>
-      <link>/project/project2/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/project/project2/</guid>
-      <description>Modeling Introduction This is the ‘College’ dataset, in which it is a dataset that containing information abbout college majors across the U.S and their median incomes. This dataset is from the American Community Survey 2010-2012 Public Use Microdata Series https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-10-16 https://github.com/rfordatascience/tidytuesday. It has 21 variables and 172 observations. The variable names it contains that are Rank, Major_code, Major, Major_category, Total, Sample_size, Men, Women, ShareWomen, Employed, Full_time, Part_time, Full_time_year_round, Unemployed, Unemployment_rate, Media, P25th, P75th, College_jobs, Non_college_jobs, and Low_wage_jobs.</description>
     </item>
     
     <item>
@@ -45,9 +55,9 @@ This got me to thinking that I automatically wanted to do my project one over do
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/projects/</guid>
-      <description> Check out some of my coding projects below:
- Wrangling &amp;amp; Exploratory Data Analysis
- Modeling, Inference, Prediction
+      <description> Check out some projects I have been working on:
+ Wrangling &amp;amp; Exploratory Data Analysis: Data Analysis on Dog Intelligence, Dog Popularity, and Dog Breeds from 2013-2019.
+ Modeling, Inference, Prediction: Statistical modeling of College Majors and Median Income.
   -- </description>
     </item>
     
@@ -57,7 +67,12 @@ This got me to thinking that I automatically wanted to do my project one over do
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/resume/</guid>
-      <description>    </description>
+      <description>Alejandra Plazola |aplazola48@gmail.com| Phone:512-318-1792| linkedin.com/in/alejandra-plazola| Del Valle, Tx 78617|
+EDUCATION University of Texas at Austin | Spring 2021 B.S.A in Biology: College of Natural Sciences
+Composite Science Certificate: UTeach, College of Natural Sciences
+Certified to teach grades 7-12 and subjects: Biology, Chemistry, Geology, and Physics.
+Google Certified Educator:Level 1
+  EXPERIENCE UT International Office | Sept.2018-May 2019  Credit Team Assistant Assist the Credit Team transfer student’s foreign credit into UT credit.</description>
     </item>
     
   </channel>

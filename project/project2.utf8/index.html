@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Alejandra Plazola" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 2:Statiscal Modeling</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/post/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project/project2.utf8/">Project 2:Statiscal Modeling</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         November 25, 2020 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <h1 id="modeling">Modeling</h1>
+<p>Alejandra Plazola and Map5667</p>
+<h2 id="introduction">Introduction</h2>
+<p>This is the &lsquo;College&rsquo; dataset, in which it is a dataset that
+containing information abbout college majors across the U.S and their median incomes. This dataset is from the American Community Survey 2010-2012 Public Use Microdata Series
+<a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-10-16">https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-10-16</a>
+<a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>. It has 21 variables and 172 observations. The variable names it contains that are Rank, Major_code, Major, Major_category, Total, Sample_size, Men, Women, ShareWomen, Employed, Full_time, Part_time, Full_time_year_round, Unemployed, Unemployment_rate, Media, P25th, P75th, College_jobs, Non_college_jobs, and Low_wage_jobs.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(mvtnorm); <span style="color:#a6e22e">library</span>(ggplot2);<span style="color:#a6e22e">library</span>(dplyr); <span style="color:#a6e22e">library</span>(tidyverse); <span style="color:#a6e22e">library</span>(lmtest);<span style="color:#a6e22e">library</span>(glmnet)
+College <span style="color:#f92672">&lt;-</span> readr<span style="color:#f92672">::</span><span style="color:#a6e22e">read_csv</span>(<span style="color:#e6db74">&#34;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-10-16/recent-grads.csv&#34;</span>)
+cg<span style="color:#f92672">&lt;-</span>College<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">na.omit</span>()
+College<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">group_by</span>(Major_category)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">count</span>()
+</code></pre></div><pre><code>## # A tibble: 16 x 2
+## # Groups:   Major_category [16]
+##    Major_category                          n
+##    &lt;chr&gt;                               &lt;int&gt;
+##  1 Agriculture &amp; Natural Resources        10
+##  2 Arts                                    8
+##  3 Biology &amp; Life Science                 14
+##  4 Business                               13
+##  5 Communications &amp; Journalism             4
+##  6 Computers &amp; Mathematics                11
+##  7 Education                              16
+##  8 Engineering                            29
+##  9 Health                                 12
+## 10 Humanities &amp; Liberal Arts              15
+## 11 Industrial Arts &amp; Consumer Services     7
+## 12 Interdisciplinary                       1
+## 13 Law &amp; Public Policy                     5
+## 14 Physical Sciences                      10
+## 15 Psychology &amp; Social Work                9
+## 16 Social Science                          9
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Subsetting data to only have 5 observations for Major_Category</span>
+College<span style="color:#f92672">&lt;-</span>College <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">filter</span>(Major_category <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Arts&#34;</span> <span style="color:#f92672">&amp;</span>
+              Major_category <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Interdisciplinary&#34;</span> <span style="color:#f92672">&amp;</span>
+              Major_category <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Law &amp; Public Policy&#34;</span><span style="color:#f92672">&amp;</span>
+              Major_category <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Industrial Arts &amp; Consumer Services&#34;</span><span style="color:#f92672">&amp;</span>
+              Major_category <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Communications &amp; Journalism&#34;</span><span style="color:#f92672">&amp;</span>
+              Major_category<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;Social Science&#34;</span><span style="color:#f92672">&amp;</span>
+              Major_category<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;Psychology &amp; Social Work&#34;</span><span style="color:#f92672">&amp;</span>
+              Major_category<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;Biology &amp; Life Science&#34;</span><span style="color:#f92672">&amp;</span>
+              Major_category<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;Agriculture &amp; Natural Resources&#34;</span><span style="color:#f92672">&amp;</span>
+            Major_category<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;Health&#34;</span><span style="color:#f92672">&amp;</span>
+            Major_category<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;Physical Sciences&#34;</span>
+            )
+</code></pre></div><h2 id="manova">MANOVA</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(College, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> Employed, y <span style="color:#f92672">=</span> Median)) <span style="color:#f92672">+</span><span style="color:#a6e22e">geom_point</span>(alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">.1</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">geom_density_2d</span>(h<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span><span style="color:#a6e22e">coord_fixed</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">facet_wrap</span>(<span style="color:#f92672">~</span>Major_category)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">MANC<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">manova</span>(<span style="color:#a6e22e">cbind</span>(Employed,Median)<span style="color:#f92672">~</span>Major_category, data<span style="color:#f92672">=</span>College)
+<span style="color:#a6e22e">summary</span>(MANC)
+</code></pre></div><pre><code>##                Df  Pillai approx F num Df den Df    Pr(&gt;F)    
+## Major_category  4 0.77805   12.575      8    158 6.901e-14 ***
+## Residuals      79                                             
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">summary.aov</span>(MANC)
+</code></pre></div><pre><code>##  Response Employed :
+##                Df     Sum Sq    Mean Sq F value   Pr(&gt;F)   
+## Major_category  4 4.5140e+10 1.1285e+10  5.0807 0.001074 **
+## Residuals      79 1.7547e+11 2.2211e+09                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##  Response Median :
+##                Df     Sum Sq    Mean Sq F value   Pr(&gt;F)    
+## Major_category  4 9576798960 2394199740  28.774 9.28e-15 ***
+## Residuals      79 6573456755   83208313                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">College<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">group_by</span>(Major_category)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">mean</span>(Employed),<span style="color:#a6e22e">mean</span>(Median))
+</code></pre></div><pre><code>## # A tibble: 5 x 3
+##   Major_category            `mean(Employed)` `mean(Median)`
+##   &lt;chr&gt;                                &lt;dbl&gt;          &lt;dbl&gt;
+## 1 Business                            83749.         43538.
+## 2 Computers &amp; Mathematics             21627.         42745.
+## 3 Education                           29990.         32350 
+## 4 Engineering                         14496.         57383.
+## 5 Humanities &amp; Liberal Arts           36275.         31913.
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">pairwise.t.test</span>(College<span style="color:#f92672">$</span>Employed, College<span style="color:#f92672">$</span>Major_category, p.adj<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;none&#34;</span>)
+</code></pre></div><pre><code>## 
+## 	Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  College$Employed and College$Major_category 
+## 
+##                           Business Computers &amp; Mathematics Education
+## Computers &amp; Mathematics   0.0019   -                       -        
+## Education                 0.0031   0.6517                  -        
+## Engineering               3.3e-05  0.6703                  0.2943   
+## Humanities &amp; Liberal Arts 0.0095   0.4360                  0.7116   
+##                           Engineering
+## Computers &amp; Mathematics   -          
+## Education                 -          
+## Engineering               -          
+## Humanities &amp; Liberal Arts 0.1502     
+## 
+## P value adjustment method: none
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">pairwise.t.test</span>(College<span style="color:#f92672">$</span>Median, College<span style="color:#f92672">$</span>Major_category, p.adj<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;none&#34;</span>)
+</code></pre></div><pre><code>## 
+## 	Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  College$Median and College$Major_category 
+## 
+##                           Business Computers &amp; Mathematics Education
+## Computers &amp; Mathematics   0.8325   -                       -        
+## Education                 0.0015   0.0047                  -        
+## Engineering               1.9e-05  2.1e-05                 2.3e-13  
+## Humanities &amp; Liberal Arts 0.0012   0.0037                  0.8944   
+##                           Engineering
+## Computers &amp; Mathematics   -          
+## Education                 -          
+## Engineering               -          
+## Humanities &amp; Liberal Arts 2.6e-13    
+## 
+## P value adjustment method: none
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Probability of at least one type I error</span>
+<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>(<span style="color:#ae81ff">0.95</span>^23)
+</code></pre></div><pre><code>## [1] 0.6926431
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Bonferroni Correction</span>
+<span style="color:#ae81ff">.05</span><span style="color:#f92672">/</span><span style="color:#ae81ff">23</span>
+</code></pre></div><pre><code>## [1] 0.002173913
+</code></pre><p>A one-way MANOVA was conducted to determine the effect of the Major_Category type (Engineering, Business, Computers&amp;Mathematics, Education, and Humanities&amp;Arts) on two dependent variables (Median and Employed). Based on the MANOVA, there was a significiant difference found between the 5 major categories, Pillai trace=0.77805,pseudo F (4, 158) = 12.575, p &lt; 0.0001. Univariate ANOVAs for each dependent variable were conducted as follow-up tests to the MANOVA, using the Bonferroni method for controlling Type I error rates for multiple comparisons.The univariate ANOVAs for Employed and Media were also significant, F (4, 79) = 5.0807, p &lt; .005, and F (2, 79) = 28.774, p &lt; .0001, respectively.Post hoc analysis was performed conducting pairwise comparisons to determine which Major_Category differed in Employed and Median. All major categories differ based on both Employment and Median income.</p>
+<p>There are several assumptions including multivariate normality, equal covariance between two dependent variables, linear relationships among variables, no extreme univariate or multivariate outliers, and no multicollinearity. It is likely that not all assumptions are met based on the density plot for each group as I can see some outliers for some.</p>
+<p>I performed 1 MANOVA, 2 ANOVAS, and 20 t tests so the bonferroni significance level is α = .05/20 = .002173913. The probability of at least one type I error, unadjusted, is 0.6926431.
+All three Species were found to differ significantly from each other in terms of sepal length and petal width after adjusting for multiple comparisons (bonferroni α = .05/9 = .0056). Both Median and Employed are still significant after finding bonferroni corrected significance level.</p>
+<h2 id="randomization-test">Randomization Test</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">348</span>)
+<span style="color:#a6e22e">summary</span>(<span style="color:#a6e22e">aov</span>(Median<span style="color:#f92672">~</span>Major_category, data<span style="color:#f92672">=</span>College))
+</code></pre></div><pre><code>##                Df    Sum Sq   Mean Sq F value   Pr(&gt;F)    
+## Major_category  4 9.577e+09 2.394e+09   28.77 9.28e-15 ***
+## Residuals      79 6.573e+09 8.321e+07                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">obs_F<span style="color:#f92672">&lt;-</span><span style="color:#ae81ff">28.77</span> <span style="color:#75715e">#this is the observed F-statistic</span>
+Fs<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">replicate</span>(<span style="color:#ae81ff">5000</span>,{ <span style="color:#75715e">#do everything in curly braces 5000 times and save the output</span>
+ new<span style="color:#f92672">&lt;-</span>College<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(Med<span style="color:#f92672">=</span><span style="color:#a6e22e">sample</span>(Median)) <span style="color:#75715e">#randomly permute response variable </span>
+ <span style="color:#75715e">#compute the F-statistic by hand</span>
+ SSW<span style="color:#f92672">&lt;-</span> new<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">group_by</span>(Major_category)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(SSW<span style="color:#f92672">=</span><span style="color:#a6e22e">sum</span>((Med<span style="color:#f92672">-</span><span style="color:#a6e22e">mean</span>(Med))^2))<span style="color:#f92672">%&gt;%</span>
+       <span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">sum</span>(SSW))<span style="color:#f92672">%&gt;%</span>pull
+ SSB<span style="color:#f92672">&lt;-</span> new<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(mean<span style="color:#f92672">=</span><span style="color:#a6e22e">mean</span>(Med))<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">group_by</span>(Major_category)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(groupmean<span style="color:#f92672">=</span><span style="color:#a6e22e">mean</span>(Med))<span style="color:#f92672">%&gt;%</span>
+       <span style="color:#a6e22e">summarize</span>(SSB<span style="color:#f92672">=</span><span style="color:#a6e22e">sum</span>((mean<span style="color:#f92672">-</span>groupmean)^2))<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize</span>(<span style="color:#a6e22e">sum</span>(SSB))<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">pull
+</span><span style="color:#a6e22e"> </span>(SSB<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">/</span>(SSW<span style="color:#f92672">/</span><span style="color:#ae81ff">57</span>) <span style="color:#75715e">#compute F statistic (num df = K-1 = 3-1, denom df = N-K = 60-3)</span>
+})
+<span style="color:#a6e22e">hist</span>(Fs, prob<span style="color:#f92672">=</span>T); <span style="color:#a6e22e">abline</span>(v<span style="color:#f92672">=</span>obs_F, col<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>, add<span style="color:#f92672">=</span>T)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">mean</span>(Fs<span style="color:#f92672">&gt;</span>obs_F)
+</code></pre></div><pre><code>## [1] 0
+</code></pre><p>The null hypothesis is that the true mean of Median income is the same for all 5 major category groups(Engineering, Computers&amp;Mathematics,Education, Humanities&amp;Arts, and Business).
+The alternative hypothesis is that at least of the means of Median incaome for all 5 major category groups differ.
+I conducted an ANOVA/Fstat test and the p-value for mean(Fs&gt;obs_F) is 0. This means none of our 5000 F stats generated under the null hypothesis were bigger than our actual F stat of 28.77 and means that it definitely rejected the null hypothesis and that major category groups do differ.</p>
+<h2 id="linear-regression-model">Linear Regression Model</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">College<span style="color:#f92672">$</span>M<span style="color:#f92672">&lt;-</span>College<span style="color:#f92672">$</span>Men<span style="color:#f92672">-</span><span style="color:#a6e22e">mean</span>(College<span style="color:#f92672">$</span>Men)
+
+College<span style="color:#f92672">$</span>W<span style="color:#f92672">&lt;-</span>College<span style="color:#f92672">$</span>Women<span style="color:#f92672">-</span><span style="color:#a6e22e">mean</span>(College<span style="color:#f92672">$</span>Women)
+
+  fit1<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">lm</span>(Median<span style="color:#f92672">~</span>W<span style="color:#f92672">+</span>M, data<span style="color:#f92672">=</span>College)
+<span style="color:#a6e22e">summary</span>(fit1)
+</code></pre></div><pre><code>## 
+## Call:
+## lm(formula = Median ~ W + M, data = College)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -23071  -9453  -2661   6324  64526 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.401e+04  1.435e+03  30.661  &lt; 2e-16 ***
+## W           -1.933e-01  5.506e-02  -3.511 0.000733 ***
+## M            1.414e-01  6.048e-02   2.339 0.021822 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 13150 on 81 degrees of freedom
+## Multiple R-squared:  0.1321,	Adjusted R-squared:  0.1107 
+## F-statistic: 6.165 on 2 and 81 DF,  p-value: 0.00322
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(College, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span>M,x<span style="color:#f92672">=</span>W, color<span style="color:#f92672">=</span>Median))<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_point</span>()<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_smooth</span>(method<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lm&#34;</span>,se<span style="color:#f92672">=</span><span style="color:#66d9ef">FALSE</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">qqnorm</span>(College<span style="color:#f92672">$</span>M)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">qqnorm</span>(College<span style="color:#f92672">$</span>W)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">shapiro.test</span>(<span style="color:#a6e22e">head</span>(College<span style="color:#f92672">$</span>M))
+</code></pre></div><pre><code>## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  head(College$M)
+## W = 0.56745, p-value = 0.000182
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">shapiro.test</span>(<span style="color:#a6e22e">head</span>(College<span style="color:#f92672">$</span>W))
+</code></pre></div><pre><code>## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  head(College$W)
+## W = 0.51881, p-value = 4.234e-05
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">bptest</span>(fit1)
+</code></pre></div><pre><code>## 
+## 	studentized Breusch-Pagan test
+## 
+## data:  fit1
+## BP = 1.7016, df = 2, p-value = 0.4271
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(sandwich)
+<span style="color:#a6e22e">coeftest</span>(fit1, vcov <span style="color:#f92672">=</span> <span style="color:#a6e22e">vcovHC</span>(fit1)) 
+</code></pre></div><pre><code>## 
+## t test of coefficients:
+## 
+##                Estimate  Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 44007.14286  1453.53766 30.2759 &lt; 2.2e-16 ***
+## W              -0.19331     0.06623 -2.9188  0.004548 ** 
+## M               0.14143     0.05465  2.5880  0.011439 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">summary</span>(fit1)<span style="color:#f92672">$</span>r.sq
+</code></pre></div><pre><code>## [1] 0.1321102
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fit2<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">lm</span>(Median<span style="color:#f92672">~</span>Men, data <span style="color:#f92672">=</span> College) <span style="color:#75715e">#main effects of lat</span>
+<span style="color:#a6e22e">summary</span>(fit2)
+</code></pre></div><pre><code>## 
+## Call:
+## lm(formula = Median ~ Men, data = College)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -22054 -10295  -3865   7221  65950 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.405e+04  1.796e+03  24.529   &lt;2e-16 ***
+## Men         -2.400e-03  4.746e-02  -0.051     0.96    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 14030 on 82 degrees of freedom
+## Multiple R-squared:  3.118e-05,	Adjusted R-squared:  -0.01216 
+## F-statistic: 0.002557 on 1 and 82 DF,  p-value: 0.9598
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fit3<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">lm</span>(Median<span style="color:#f92672">~</span>Women, data<span style="color:#f92672">=</span> College)
+<span style="color:#a6e22e">summary</span>(fit3)
+</code></pre></div><pre><code>## 
+## Call:
+## lm(formula = Median ~ Women, data = College)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -24115 -10415   -950   7291  63812 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.622e+04  1.710e+03  27.031   &lt;2e-16 ***
+## Women       -1.061e-01  4.159e-02  -2.551   0.0126 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 13510 on 82 degrees of freedom
+## Multiple R-squared:  0.07351,	Adjusted R-squared:  0.06221 
+## F-statistic: 6.506 on 1 and 82 DF,  p-value: 0.01261
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#install.packages(&#34;interactions&#34;)</span>
+<span style="color:#a6e22e">library</span>(interactions)
+<span style="color:#a6e22e">interact_plot</span>(fit1,M,W) <span style="color:#75715e">#interaction plot </span>
+</code></pre></div><p><!-- raw HTML omitted -->
+For every one unit increase in Median income, the total number of Women decreases by .01933 units and the total number of Men increases by .01414 units. The linearity assumption is violated based on the ggplot. There does not seem to be normality based on the q-q plots. From the Shapiro-Wilk, the p-value &lt; 0.05 implying that the distribution of the data are significantly different from normal distribution; meaning we cannot assume normalitiy. Based on the Breusch-Pagan test, the p-Value &gt; 0.05 indicates that the null hypothesis can rejected and therefore heterscedasticity does exists. With the robust standard errors, the t-values increases for the intercept and M, the t-values for W decreases, the p-values for Intercept and M decreased, and the p-values for W increased. The proportion of the variation in the outcome explained by this model is 0.1321102.</p>
+<h2 id="bootstrapped-standard-error">Bootstrapped Standard Error</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">348</span>)
+fit4<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">lm</span>(Median<span style="color:#f92672">~</span>Men<span style="color:#f92672">*</span>Women, data<span style="color:#f92672">=</span>College)
+boot_sd<span style="color:#f92672">&lt;-</span>College<span style="color:#a6e22e">[sample</span>(<span style="color:#a6e22e">nrow</span>(College),replace<span style="color:#f92672">=</span>T),]
+samp_distn<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">replicate</span>(<span style="color:#ae81ff">1000</span>,{
+  boot_sd<span style="color:#f92672">&lt;-</span>College<span style="color:#a6e22e">[sample</span>(<span style="color:#a6e22e">nrow</span>(College),replace<span style="color:#f92672">=</span>T),]
+  fit5<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">lm</span>(Median<span style="color:#f92672">~</span>Men<span style="color:#f92672">*</span>Women, data<span style="color:#f92672">=</span>boot_sd)
+  <span style="color:#a6e22e">coef</span>(fit5)
+})
+samp_distn<span style="color:#f92672">%&gt;%</span>t<span style="color:#f92672">%&gt;%</span>as.data.frame<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize_all</span>(sd)
+</code></pre></div><pre><code>##   (Intercept)        Men     Women    Men:Women
+## 1    2436.675 0.07474423 0.1286051 1.675863e-06
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Uncorrected SEs</span>
+<span style="color:#a6e22e">summary</span>(fit4)
+</code></pre></div><pre><code>## 
+## Call:
+## lm(formula = Median ~ Men * Women, data = College)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -23170  -9449  -2706   6294  64437 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.534e+04  1.949e+03  23.265  &lt; 2e-16 ***
+## Men          1.342e-01  8.733e-02   1.537  0.12831    
+## Women       -1.973e-01  6.541e-02  -3.017  0.00343 ** 
+## Men:Women    1.032e-07  8.944e-07   0.115  0.90839    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 13240 on 80 degrees of freedom
+## Multiple R-squared:  0.1323,	Adjusted R-squared:  0.09971 
+## F-statistic: 4.064 on 3 and 80 DF,  p-value: 0.009666
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Corrected SEs</span>
+<span style="color:#a6e22e">coeftest</span>(fit4, vcov<span style="color:#f92672">=</span><span style="color:#a6e22e">vcovHC</span>(fit4))
+</code></pre></div><pre><code>## 
+## t test of coefficients:
+## 
+##                Estimate  Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.5342e+04  2.2933e+03 19.7712  &lt; 2e-16 ***
+## Men          1.3420e-01  6.1517e-02  2.1815  0.03208 *  
+## Women       -1.9733e-01  9.8574e-02 -2.0018  0.04870 *  
+## Men:Women    1.0325e-07  8.4765e-07  0.1218  0.90336    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><p>The SEs for the uncorrected SEs for the Intercept and Women seem to be smaller than the corrected SEs. The SEs for the uncorrected SEs for Men and Men:Women tend to be bigger than corrected SEs.
+The p-values for the uncorrected SEs for intercept, Men, Men:Women seem to be lower than the p-values for the corrected SEs. The p-value for Women for the uncorrected SEs seem to be higher than the p-value for the corrected SE.</p>
+<h2 id="logistic-regression-model">Logistic Regression Model</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">College_new <span style="color:#f92672">&lt;-</span> College <span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate</span>(Major_cat <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(Major_category <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Engineering&#34;</span>, <span style="color:#e6db74">&#39;Eng&#39;</span>, <span style="color:#e6db74">&#39;Other&#39;</span>))
+College_new<span style="color:#f92672">$</span>y<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ifelse</span>(College_new<span style="color:#f92672">$</span>Major_cat<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;Eng&#34;</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">0</span>)
+fit6<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">glm</span>(y<span style="color:#f92672">~</span>P25th<span style="color:#f92672">+</span>P75th, data<span style="color:#f92672">=</span>College_new, family<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;binomial&#34;</span>)
+<span style="color:#a6e22e">coeftest</span>(fit6)
+</code></pre></div><pre><code>## 
+## z test of coefficients:
+## 
+##                Estimate  Std. Error z value  Pr(&gt;|z|)    
+## (Intercept) -1.0572e+01  2.2396e+00 -4.7205 2.353e-06 ***
+## P25th        1.1565e-04  6.2369e-05  1.8543  0.063703 .  
+## P75th        1.0598e-04  3.9637e-05  2.6737  0.007502 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">exp</span>(<span style="color:#a6e22e">coef</span>(fit6))
+</code></pre></div><pre><code>##  (Intercept)        P25th        P75th 
+## 2.561903e-05 1.000116e+00 1.000106e+00
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">College_new<span style="color:#f92672">$</span>probs<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">predict</span>(fit6, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;response&#34;</span>)
+<span style="color:#a6e22e">table</span>(predict<span style="color:#f92672">=</span><span style="color:#a6e22e">as.numeric</span>(College_new<span style="color:#f92672">$</span>probs<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0.5</span>),truth<span style="color:#f92672">=</span>College_new<span style="color:#f92672">$</span>y)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">addmargins</span>()
+</code></pre></div><pre><code>##        truth
+## predict  0  1 Sum
+##     0   48  5  53
+##     1    7 24  31
+##     Sum 55 29  84
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Sensitivity(TPR)</span>
+<span style="color:#ae81ff">24</span><span style="color:#f92672">/</span><span style="color:#ae81ff">29</span>
+</code></pre></div><pre><code>## [1] 0.8275862
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Specificity(TNR)</span>
+<span style="color:#ae81ff">48</span><span style="color:#f92672">/</span><span style="color:#ae81ff">55</span>
+</code></pre></div><pre><code>## [1] 0.8727273
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Precision(PPV)</span>
+<span style="color:#ae81ff">24</span><span style="color:#f92672">/</span><span style="color:#ae81ff">31</span>
+</code></pre></div><pre><code>## [1] 0.7741935
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">## GIVE IT PREDICTED PROBS AND TRUTH LABELS (0/1), RETURNS VARIOUS DIAGNOSTICS</span>
+
+class_diag <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(probs,truth){
+<span style="color:#75715e">#CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV</span>
+
+<span style="color:#a6e22e">if</span>(<span style="color:#a6e22e">is.character</span>(truth)<span style="color:#f92672">==</span><span style="color:#66d9ef">TRUE</span>) truth<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">as.factor</span>(truth)
+<span style="color:#a6e22e">if</span>(<span style="color:#a6e22e">is.numeric</span>(truth)<span style="color:#f92672">==</span><span style="color:#66d9ef">FALSE</span> <span style="color:#f92672">&amp;</span> <span style="color:#a6e22e">is.logical</span>(truth)<span style="color:#f92672">==</span><span style="color:#66d9ef">FALSE</span>) truth<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">as.numeric</span>(truth)<span style="color:#ae81ff">-1</span>
+
+tab<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">table</span>(<span style="color:#a6e22e">factor</span>(probs<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">.5</span>,levels<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;FALSE&#34;</span>,<span style="color:#e6db74">&#34;TRUE&#34;</span>)),<span style="color:#a6e22e">factor</span>(truth, levels<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>)))
+acc<span style="color:#f92672">=</span><span style="color:#a6e22e">sum</span>(<span style="color:#a6e22e">diag</span>(tab))<span style="color:#f92672">/</span><span style="color:#a6e22e">sum</span>(tab)
+sens<span style="color:#f92672">=</span>tab[2,<span style="color:#ae81ff">2</span>]<span style="color:#f92672">/</span><span style="color:#a6e22e">colSums</span>(tab)[2]
+spec<span style="color:#f92672">=</span>tab[1,<span style="color:#ae81ff">1</span>]<span style="color:#f92672">/</span><span style="color:#a6e22e">colSums</span>(tab)[1]
+ppv<span style="color:#f92672">=</span>tab[2,<span style="color:#ae81ff">2</span>]<span style="color:#f92672">/</span><span style="color:#a6e22e">rowSums</span>(tab)[2]
+f1<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>(sens<span style="color:#f92672">*</span>ppv)<span style="color:#f92672">/</span>(sens<span style="color:#f92672">+</span>ppv)
+
+<span style="color:#75715e">#CALCULATE EXACT AUC</span>
+ord<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">order</span>(probs, decreasing<span style="color:#f92672">=</span><span style="color:#66d9ef">TRUE</span>)
+probs <span style="color:#f92672">&lt;-</span> probs[ord]; truth <span style="color:#f92672">&lt;-</span> truth[ord]
+
+TPR<span style="color:#f92672">=</span><span style="color:#a6e22e">cumsum</span>(truth)<span style="color:#f92672">/</span><span style="color:#a6e22e">max</span>(<span style="color:#ae81ff">1</span>,<span style="color:#a6e22e">sum</span>(truth)) 
+FPR<span style="color:#f92672">=</span><span style="color:#a6e22e">cumsum</span>(<span style="color:#f92672">!</span>truth)<span style="color:#f92672">/</span><span style="color:#a6e22e">max</span>(<span style="color:#ae81ff">1</span>,<span style="color:#a6e22e">sum</span>(<span style="color:#f92672">!</span>truth))
+
+dup<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">c</span>(probs[<span style="color:#ae81ff">-1</span>]<span style="color:#f92672">&gt;=</span>probs[<span style="color:#f92672">-</span><span style="color:#a6e22e">length</span>(probs)], <span style="color:#66d9ef">FALSE</span>)
+TPR<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>,TPR[<span style="color:#f92672">!</span>dup],<span style="color:#ae81ff">1</span>); FPR<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>,FPR[<span style="color:#f92672">!</span>dup],<span style="color:#ae81ff">1</span>)
+n <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">length</span>(TPR)
+auc<span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">sum</span>( ((TPR[<span style="color:#ae81ff">-1</span>]<span style="color:#f92672">+</span>TPR[<span style="color:#f92672">-</span>n])<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">*</span> (FPR[<span style="color:#ae81ff">-1</span>]<span style="color:#f92672">-</span>FPR[<span style="color:#f92672">-</span>n]) )
+
+<span style="color:#a6e22e">data.frame</span>(acc,sens,spec,ppv,f1,auc)
+}
+probs1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">predict</span>(fit6, type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;response&#34;</span>)
+<span style="color:#a6e22e">class_diag</span>(probs1, College_new<span style="color:#f92672">$</span>y)
+</code></pre></div><pre><code>##         acc      sens      spec       ppv  f1       auc
+## 1 0.8571429 0.8275862 0.8727273 0.7741935 0.8 0.9213166
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">College_new<span style="color:#f92672">$</span>logit<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">predict</span>(fit6, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;link&#34;</span>)
+
+College_new<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">ggplot</span>()<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_density</span>(<span style="color:#a6e22e">aes</span>(logit,color<span style="color:#f92672">=</span>Major_cat,fill<span style="color:#f92672">=</span>Major_cat), alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">.4</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(legend.position<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">.83</span>,<span style="color:#ae81ff">.83</span>))<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_vline</span>(xintercept<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)<span style="color:#f92672">+</span><span style="color:#a6e22e">xlab</span>(<span style="color:#e6db74">&#34;logit (log-odds)&#34;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_rug</span>(<span style="color:#a6e22e">aes</span>(logit,color<span style="color:#f92672">=</span>Major_cat))
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(plotROC)
+<span style="color:#75715e">#ROCCurve</span>
+ROCplot<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ggplot</span>(College_new)<span style="color:#f92672">+</span><span style="color:#a6e22e">geom_roc</span>(<span style="color:#a6e22e">aes</span>(d<span style="color:#f92672">=</span>y,m<span style="color:#f92672">=</span>probs), n.cuts<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_segment</span>(<span style="color:#a6e22e">aes</span>(x<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,xend<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,y<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,yend<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>),lty<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+ROCplot
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#AUC</span>
+<span style="color:#a6e22e">calc_auc</span>(ROCplot)
+</code></pre></div><pre><code>##   PANEL group       AUC
+## 1     1    -1 0.9213166
+</code></pre><p>The logistic regression model tells us the odds of being an Engineering major for when p25th income=0 and p75th income=0 is 2.561903e-05. Controlling for Engineering Major and P75th income, for every additional unit of P25th the odds of it being an Engineering major it increases by 1.000116. Controlling for Engineering and P25th income, the odds of it an Engineering major to increase income is by 1.000106.</p>
+<p>The TPR/Sensitivity is 0.8275862, and the TNR/Specificity is 0.8727273: this means the model is good at predictings that the probability a major being either Engineering or other(the other 4 grouped together).The PPV/Precision is .7741935 which gives us the proportion of those majors classified as Engineering being Engineering. The accurarcy is .8571429 meaning it seems to be pretty good. The AUC found is 0.9213166, meaning the this model is &ldquo;great!&rdquo; at predicting between postive and negative classes.</p>
+<p>The ROC curves shows the trade-off between TPR and TNR. The AUC caclculated is 0.9213166, meaning the this model is &ldquo;great!&rdquo;, there is no change (this an error on my part).</p>
+<h2 id="logistic-regression-binary">Logistic regression Binary</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#log regression using binary</span>
+cn<span style="color:#f92672">&lt;-</span>College_new<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span><span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Major&#34;</span>,<span style="color:#e6db74">&#34;Major_category&#34;</span>,<span style="color:#e6db74">&#34;Major_cat&#34;</span>))
+fit8<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">glm</span>(y<span style="color:#f92672">~</span>., data<span style="color:#f92672">=</span>cn, family<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;binomial&#39;</span>)
+<span style="color:#a6e22e">coeftest</span>(fit8)
+</code></pre></div><pre><code>## 
+## z test of coefficients:
+## 
+##                         Estimate  Std. Error   z value  Pr(&gt;|z|)    
+## (Intercept)           3.5129e+15  8.8044e+07  39899598 &lt; 2.2e-16 ***
+## Rank                 -8.3834e+12  3.8359e+05 -21855287 &lt; 2.2e-16 ***
+## Major_code           -5.5228e+11  6.0623e+03 -91101451 &lt; 2.2e-16 ***
+## Total                -4.6614e+09  8.7626e+03   -531961 &lt; 2.2e-16 ***
+## Men                  -6.2021e+10  1.5267e+03 -40624207 &lt; 2.2e-16 ***
+## Women                         NA          NA        NA        NA    
+## ShareWomen           -3.9487e+15  6.6713e+07 -59188520 &lt; 2.2e-16 ***
+## Sample_size          -2.7808e+12  1.8438e+05 -15081528 &lt; 2.2e-16 ***
+## Employed             -1.1866e+12  2.0057e+04 -59159886 &lt; 2.2e-16 ***
+## Full_time             1.1348e+12  1.7577e+04  64563951 &lt; 2.2e-16 ***
+## Part_time             8.0787e+11  1.5114e+04  53452666 &lt; 2.2e-16 ***
+## Full_time_year_round  1.1557e+11  1.0886e+04  10616819 &lt; 2.2e-16 ***
+## Unemployed           -1.9980e+11  2.6140e+04  -7643753 &lt; 2.2e-16 ***
+## Unemployment_rate    -8.8899e+15  2.8385e+08 -31318709 &lt; 2.2e-16 ***
+## Median                1.5554e+10  2.7160e+03   5726761 &lt; 2.2e-16 ***
+## P25th                 6.2014e+10  2.0545e+03  30185236 &lt; 2.2e-16 ***
+## P75th                -5.8257e+10  1.5804e+03 -36861007 &lt; 2.2e-16 ***
+## College_jobs          1.6772e+10  1.6381e+03  10238463 &lt; 2.2e-16 ***
+## Non_college_jobs      2.2093e+10  3.2233e+03   6854020 &lt; 2.2e-16 ***
+## Low_wage_jobs         6.4540e+10  1.0496e+04   6149051 &lt; 2.2e-16 ***
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 4 rows ]
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">exp</span>(<span style="color:#a6e22e">coef</span>(fit8))
+</code></pre></div><pre><code>##          (Intercept)                 Rank           Major_code 
+##                  Inf                    0                    0 
+##                Total                  Men                Women 
+##                    0                    0                   NA 
+##           ShareWomen          Sample_size             Employed 
+##                    0                    0                    0 
+##            Full_time            Part_time Full_time_year_round 
+##                  Inf                  Inf                  Inf 
+##           Unemployed    Unemployment_rate               Median 
+##                    0                    0                  Inf 
+##                P25th                P75th         College_jobs 
+##                  Inf                    0                  Inf 
+##     Non_college_jobs        Low_wage_jobs                    M 
+##                  Inf                  Inf                   NA 
+##                    W                probs                logit 
+##                   NA                  Inf                   NA
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">probs2<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">predict</span>(fit8, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;response&#34;</span>)
+<span style="color:#a6e22e">class_diag</span>(probs2, cn<span style="color:#f92672">$</span>y)
+</code></pre></div><pre><code>##         acc      sens      spec       ppv        f1       auc
+## 1 0.9642857 0.9310345 0.9818182 0.9642857 0.9473684 0.9564263
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">summary</span>(fit8)
+</code></pre></div><pre><code>## 
+## Call:
+## glm(formula = y ~ ., family = &quot;binomial&quot;, data = cn)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+##  -8.49    0.00    0.00    0.00    8.49  
+## 
+## Coefficients: (4 not defined because of singularities)
+##                        Estimate Std. Error   z value Pr(&gt;|z|)    
+## (Intercept)           3.513e+15  8.804e+07  39899598   &lt;2e-16 ***
+## Rank                 -8.383e+12  3.836e+05 -21855287   &lt;2e-16 ***
+## Major_code           -5.523e+11  6.062e+03 -91101451   &lt;2e-16 ***
+## Total                -4.661e+09  8.763e+03   -531961   &lt;2e-16 ***
+## Men                  -6.202e+10  1.527e+03 -40624207   &lt;2e-16 ***
+## Women                        NA         NA        NA       NA    
+## ShareWomen           -3.949e+15  6.671e+07 -59188520   &lt;2e-16 ***
+## Sample_size          -2.781e+12  1.844e+05 -15081528   &lt;2e-16 ***
+## Employed             -1.187e+12  2.006e+04 -59159886   &lt;2e-16 ***
+## Full_time             1.135e+12  1.758e+04  64563951   &lt;2e-16 ***
+## Part_time             8.079e+11  1.511e+04  53452666   &lt;2e-16 ***
+## Full_time_year_round  1.156e+11  1.089e+04  10616819   &lt;2e-16 ***
+## Unemployed           -1.998e+11  2.614e+04  -7643753   &lt;2e-16 ***
+## Unemployment_rate    -8.890e+15  2.839e+08 -31318709   &lt;2e-16 ***
+## Median                1.555e+10  2.716e+03   5726761   &lt;2e-16 ***
+## P25th                 6.201e+10  2.054e+03  30185236   &lt;2e-16 ***
+## P75th                -5.826e+10  1.580e+03 -36861007   &lt;2e-16 ***
+## College_jobs          1.677e+10  1.638e+03  10238463   &lt;2e-16 ***
+## Non_college_jobs      2.209e+10  3.223e+03   6854020   &lt;2e-16 ***
+## Low_wage_jobs         6.454e+10  1.050e+04   6149051   &lt;2e-16 ***
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 4 rows ]
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 108.27  on 83  degrees of freedom
+## Residual deviance: 216.26  on 64  degrees of freedom
+## AIC: 256.26
+## 
+## Number of Fisher Scoring iterations: 16
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">348</span>)
+k <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>
+data <span style="color:#f92672">&lt;-</span> cn<span style="color:#a6e22e">[sample</span>(<span style="color:#a6e22e">nrow</span>(cn)), ]
+folds <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">cut</span>(<span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#a6e22e">nrow</span>(cn)), breaks <span style="color:#f92672">=</span> k, labels <span style="color:#f92672">=</span> F)
+
+diags <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">NULL</span>
+<span style="color:#a6e22e">for </span>(i in <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>k) {
+    train <span style="color:#f92672">&lt;-</span> data[folds <span style="color:#f92672">!=</span> i, ]
+    test <span style="color:#f92672">&lt;-</span> data[folds <span style="color:#f92672">==</span> i, ]
+    truth <span style="color:#f92672">&lt;-</span> test<span style="color:#f92672">$</span>y
+    fit <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">glm</span>(y <span style="color:#f92672">~</span> ., data <span style="color:#f92672">=</span> train, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;binomial&#34;</span>)
+    probs <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">predict</span>(fit, newdata <span style="color:#f92672">=</span> test, type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;response&#34;</span>)
+    diags <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">rbind</span>(diags, <span style="color:#a6e22e">class_diag</span>(probs, truth))
+}
+
+<span style="color:#a6e22e">summarize_all</span>(diags, mean)
+</code></pre></div><pre><code>##         acc  sens      spec       ppv        f1       auc
+## 1 0.7638889 0.735 0.7828571 0.6666667 0.6797619 0.8003571
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#lasso regression</span>
+<span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">348</span>)
+cn<span style="color:#f92672">&lt;-</span>College_new<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span><span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Major&#34;</span>,<span style="color:#e6db74">&#34;Major_category&#34;</span>,<span style="color:#e6db74">&#34;Major_cat&#34;</span>))
+<span style="color:#a6e22e">library</span>(glmnet)
+<span style="color:#a6e22e">data</span>(cn)
+y<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">as.matrix</span>(cn<span style="color:#f92672">$</span>y)
+x<span style="color:#f92672">&lt;-</span>cn<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span>y)<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">mutate_all</span>(scale)<span style="color:#f92672">%&gt;%</span>as.matrix
+<span style="color:#a6e22e">head</span>(x)
+</code></pre></div><pre><code>##           Rank Major_code      Total         Men      Women ShareWomen
+## [1,] -1.334998 -0.5954497 -0.6135406 -0.54597552 -0.5765891 -1.3952364
+## [2,] -1.316422 -0.5973626 -0.6389159 -0.58843378 -0.5823396 -1.4736612
+## [3,] -1.297847 -0.5980003 -0.6373129 -0.58701645 -0.5808248 -1.2591408
+## [4,] -1.279271 -0.5967250 -0.6308689 -0.57475347 -0.5807126 -1.4507725
+##      Sample_size   Employed  Full_time  Part_time Full_time_year_round
+## [1,]  -0.5236655 -0.6015220 -0.5834324 -0.6517978           -0.5711890
+## [2,]  -0.5656982 -0.6274359 -0.6117473 -0.6602564           -0.5940255
+## [3,]  -0.5714958 -0.6272807 -0.6117035 -0.6633861           -0.5953639
+## [4,]  -0.5526536 -0.6251471 -0.6005133 -0.6619481           -0.5855489
+##      Unemployed Unemployment_rate   Median     P25th    P75th College_jobs
+## [1,] -0.6129443        -1.6039785 4.730927 5.6640426 4.071532   -0.5993097
+## [2,] -0.6006506         1.5782654 2.221831 2.0320334 2.027737   -0.6614842
+## [3,] -0.6183228        -1.4199900 2.078454 1.5780323 2.903649   -0.6559179
+## [4,] -0.6121759        -0.5821417 1.863388 0.9424307 1.443795   -0.6520845
+##      Non_college_jobs Low_wage_jobs           M          W    probs    logit
+## [1,]       -0.5185841    -0.5265120 -0.54597552 -0.5765891 1.903466 4.907594
+## [2,]       -0.5230610    -0.5485560 -0.58843378 -0.5823396 1.889406 2.106488
+## [3,]       -0.5264501    -0.5562637 -0.58701645 -0.5808248 1.898339 2.446391
+## [4,]       -0.5295462    -0.5562637 -0.57475347 -0.5807126 1.748794 1.283963
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 2 rows ]
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">cv<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">cv.glmnet</span>(x,y)
+lasso1<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">glmnet</span>(x,y,lambda<span style="color:#f92672">=</span>cv<span style="color:#f92672">$</span>lambda.1se)
+<span style="color:#a6e22e">coef</span>(lasso1)
+</code></pre></div><pre><code>## 24 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                               s0
+## (Intercept)           0.34523810
+## Rank                 -0.03610480
+## Major_code           -0.09511901
+## Total                 .         
+## Men                   .         
+## Women                 .         
+## ShareWomen           -0.08307175
+## Sample_size           .         
+## Employed              .         
+## Full_time             .         
+## Part_time             .         
+## Full_time_year_round  .         
+## Unemployed            .         
+## Unemployment_rate     .         
+## Median                0.05774517
+## P25th                 .         
+## P75th                 .         
+## College_jobs          .         
+## Non_college_jobs      .         
+## Low_wage_jobs         .         
+## M                     .         
+## W                     .         
+## probs                 0.12926262
+## logit                 .
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">prob<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">predict</span>(lasso1, newx<span style="color:#f92672">=</span>x, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;response&#34;</span>)
+<span style="color:#a6e22e">class_diag</span>(prob,cn<span style="color:#f92672">$</span>y)
+</code></pre></div><pre><code>##         acc     sens      spec       ppv        f1       auc
+## 1 0.8928571 0.862069 0.9090909 0.8333333 0.8474576 0.9768025
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">k<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+data <span style="color:#f92672">&lt;-</span> cn <span style="color:#f92672">%&gt;%</span> sample_frac <span style="color:#75715e">#put rows of dataset in random order</span>
+folds <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ntile</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#a6e22e">nrow</span>(data),n<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>) <span style="color:#75715e">#create fold labels</span>
+diags<span style="color:#f92672">&lt;-</span><span style="color:#66d9ef">NULL</span>
+<span style="color:#a6e22e">for</span>(i in <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>k){
+  train <span style="color:#f92672">&lt;-</span> data[folds<span style="color:#f92672">!=</span>i,] <span style="color:#75715e">#create training set (all but fold i)</span>
+  test <span style="color:#f92672">&lt;-</span> data[folds<span style="color:#f92672">==</span>i,] <span style="color:#75715e">#create test set (just fold i)</span>
+  truth <span style="color:#f92672">&lt;-</span> test<span style="color:#f92672">$</span>y <span style="color:#75715e">#save truth labels from fold i</span>
+  fit <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">glm</span>(y<span style="color:#f92672">~</span>Rank<span style="color:#f92672">+</span>Major_code<span style="color:#f92672">+</span> ShareWomen<span style="color:#f92672">+</span>Median,
+             data<span style="color:#f92672">=</span>train, family<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;binomial&#34;</span>)
+  probs <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">predict</span>(fit, newdata<span style="color:#f92672">=</span>test, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;response&#34;</span>)
+  diags<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">rbind</span>(diags,<span style="color:#a6e22e">class_diag</span>(probs,truth))
+}
+diags<span style="color:#f92672">%&gt;%</span><span style="color:#a6e22e">summarize_all</span>(mean)
+</code></pre></div><pre><code>##         acc      sens     spec       ppv        f1       auc
+## 1 0.8847222 0.8738095 0.869881 0.8490476 0.8389744 0.9580952
+</code></pre><p>The logistic regression using Binary variables acc= .9404762 meaning it is pretty much accurate at predicting, sens= 0.9655172, spec=0.9272727, ppv=0.875, and AUC=0.946395. This model is a great fit for the predicted probilities of Engineering.
+The 10-fold CV model&rsquo;s acc=0.7638889, sens=0.735 spec=0.7828571, ppv=0.6666667, and AUC=0.8003571. The AUC is fair and when compared to original logistic regression AUC is decreased so the out of sampling isn&rsquo;t good in showing the model.</p>
+<p>The variables retained are Rank, Major_code, ShareWomen, and Median. The lasso regression cv performance shows acc=0.8928571, sens=0.862069, spec=0.9090909 and ppv= 0.8333333. The AUC of the lasso regression is 0.9768025, which means it is great and when compared to past AUC it is the highest.</p>
+<p>The out-of-sample AUC of the 10-fold CV of the lasso variables selected is 0.9580952. When comparing the AUC to the logistic regression above it is higher but lower than lasso regression cv.</p>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

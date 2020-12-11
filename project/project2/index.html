@@ -7,7 +7,7 @@
     <meta name="author" content="Alejandra Plazola" />
     
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-    <title>Project 2.</title>
+    <title>Project 2:Statiscal Modeling</title>
     <meta name="generator" content="Hugo 0.79.0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
@@ -54,13 +54,13 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="/project/project2/">Project 2.</a></strong>
+            <strong><a href="/project/project2/">Project 2:Statiscal Modeling</a></strong>
           </h3>
         </div>
  
 <div class="blog-title">
           <h4>
-         January 1, 0001 
+         November 25, 2020 
             &nbsp;&nbsp;
             
           </h4>
@@ -74,6 +74,7 @@
 
 <div id="modeling" class="section level1">
 <h1>Modeling</h1>
+<p>Alejandra Plazola and Map5667</p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>This is the ‘College’ dataset, in which it is a dataset that
@@ -117,7 +118,9 @@ College&lt;-College %&gt;% filter(Major_category != &quot;Arts&quot; &amp;
             Major_category!=&quot;Health&quot;&amp;
             Major_category!=&quot;Physical Sciences&quot;
             )</code></pre>
-<p>##MANOVA</p>
+</div>
+<div id="manova" class="section level2">
+<h2>MANOVA</h2>
 <pre class="r"><code>ggplot(College, aes(x = Employed, y = Median)) +geom_point(alpha = .1) + geom_density_2d(h=2) +coord_fixed() + facet_wrap(~Major_category)</code></pre>
 <p><img src="/project/project2_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>MANC&lt;-manova(cbind(Employed,Median)~Major_category, data=College)
@@ -196,7 +199,9 @@ summary(MANC)</code></pre>
 <p>There are several assumptions including multivariate normality, equal covariance between two dependent variables, linear relationships among variables, no extreme univariate or multivariate outliers, and no multicollinearity. It is likely that not all assumptions are met based on the density plot for each group as I can see some outliers for some.</p>
 <p>I performed 1 MANOVA, 2 ANOVAS, and 20 t tests so the bonferroni significance level is α = .05/20 = .002173913. The probability of at least one type I error, unadjusted, is 0.6926431.
 All three Species were found to differ significantly from each other in terms of sepal length and petal width after adjusting for multiple comparisons (bonferroni α = .05/9 = .0056). Both Median and Employed are still significant after finding bonferroni corrected significance level.</p>
-<p>##Randomization Test</p>
+</div>
+<div id="randomization-test" class="section level2">
+<h2>Randomization Test</h2>
 <pre class="r"><code>set.seed(348)
 summary(aov(Median~Major_category, data=College))</code></pre>
 <pre><code>##                Df    Sum Sq   Mean Sq F value   Pr(&gt;F)    
@@ -221,7 +226,9 @@ hist(Fs, prob=T); abline(v=obs_F, col=&quot;red&quot;, add=T)</code></pre>
 <p>The null hypothesis is that the true mean of Median income is the same for all 5 major category groups(Engineering, Computers&amp;Mathematics,Education, Humanities&amp;Arts, and Business).
 The alternative hypothesis is that at least of the means of Median incaome for all 5 major category groups differ.
 I conducted an ANOVA/Fstat test and the p-value for mean(Fs&gt;obs_F) is 0. This means none of our 5000 F stats generated under the null hypothesis were bigger than our actual F stat of 28.77 and means that it definitely rejected the null hypothesis and that major category groups do differ.</p>
-<p>##Linear Regression Model</p>
+</div>
+<div id="linear-regression-model" class="section level2">
+<h2>Linear Regression Model</h2>
 <pre class="r"><code>College$M&lt;-College$Men-mean(College$Men)
 
 College$W&lt;-College$Women-mean(College$Women)
@@ -329,7 +336,9 @@ library(interactions)
 interact_plot(fit1,M,W) #interaction plot </code></pre>
 <p><img src="/project/project2_files/figure-html/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" />
 For every one unit increase in Median income, the total number of Women decreases by .01933 units and the total number of Men increases by .01414 units. The linearity assumption is violated based on the ggplot. There does not seem to be normality based on the q-q plots. From the Shapiro-Wilk, the p-value &lt; 0.05 implying that the distribution of the data are significantly different from normal distribution; meaning we cannot assume normalitiy. Based on the Breusch-Pagan test, the p-Value &gt; 0.05 indicates that the null hypothesis can rejected and therefore heterscedasticity does exists. With the robust standard errors, the t-values increases for the intercept and M, the t-values for W decreases, the p-values for Intercept and M decreased, and the p-values for W increased. The proportion of the variation in the outcome explained by this model is 0.1321102.</p>
-<p>##Bootstrapped Standard Error</p>
+</div>
+<div id="bootstrapped-standard-error" class="section level2">
+<h2>Bootstrapped Standard Error</h2>
 <pre class="r"><code>set.seed(348)
 fit4&lt;-lm(Median~Men*Women, data=College)
 boot_sd&lt;-College[sample(nrow(College),replace=T),]
@@ -377,7 +386,9 @@ coeftest(fit4, vcov=vcovHC(fit4))</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The SEs for the uncorrected SEs for the Intercept and Women seem to be smaller than the corrected SEs. The SEs for the uncorrected SEs for Men and Men:Women tend to be bigger than corrected SEs.
 The p-values for the uncorrected SEs for intercept, Men, Men:Women seem to be lower than the p-values for the corrected SEs. The p-value for Women for the uncorrected SEs seem to be higher than the p-value for the corrected SE.</p>
-<p>##Logistic Regression Model</p>
+</div>
+<div id="logistic-regression-model" class="section level2">
+<h2>Logistic Regression Model</h2>
 <pre class="r"><code>College_new &lt;- College %&gt;%mutate(Major_cat = if_else(Major_category == &quot;Engineering&quot;, &#39;Eng&#39;, &#39;Other&#39;))
 College_new$y&lt;-ifelse(College_new$Major_cat==&quot;Eng&quot;,1,0)
 fit6&lt;-glm(y~P25th+P75th, data=College_new, family=&quot;binomial&quot;)
@@ -462,7 +473,9 @@ calc_auc(ROCplot)</code></pre>
 <p>The logistic regression model tells us the odds of being an Engineering major for when p25th income=0 and p75th income=0 is 2.561903e-05. Controlling for Engineering Major and P75th income, for every additional unit of P25th the odds of it being an Engineering major it increases by 1.000116. Controlling for Engineering and P25th income, the odds of it an Engineering major to increase income is by 1.000106.</p>
 <p>The TPR/Sensitivity is 0.8275862, and the TNR/Specificity is 0.8727273: this means the model is good at predictings that the probability a major being either Engineering or other(the other 4 grouped together).The PPV/Precision is .7741935 which gives us the proportion of those majors classified as Engineering being Engineering. The accurarcy is .8571429 meaning it seems to be pretty good. The AUC found is 0.9213166, meaning the this model is “great!” at predicting between postive and negative classes.</p>
 <p>The ROC curves shows the trade-off between TPR and TNR. The AUC caclculated is 0.9213166, meaning the this model is “great!”, there is no change (this an error on my part).</p>
-<p>##Logistic regression Binary</p>
+</div>
+<div id="logistic-regression-binary" class="section level2">
+<h2>Logistic regression Binary</h2>
 <pre class="r"><code>#log regression using binary
 cn&lt;-College_new%&gt;%select(-c(&quot;Major&quot;,&quot;Major_category&quot;,&quot;Major_cat&quot;))
 fit8&lt;-glm(y~., data=cn, family=&#39;binomial&#39;)

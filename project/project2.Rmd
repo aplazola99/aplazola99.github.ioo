@@ -1,7 +1,7 @@
 ---
-title: 'Project 2.'
+title: 'Project 2:Statiscal Modeling'
 author: "Alejandra Plazola and Map5667"
-date: "November 25, 2020"
+date: "2020-11-25"
 output:
   html_document:
     toc: yes
@@ -20,6 +20,8 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 ```
 
 # Modeling
+Alejandra Plazola and Map5667
+
 ## Introduction
 This is the 'College' dataset, in which it is a dataset that 
 containing information abbout college majors across the U.S and their median incomes. This dataset is from the American Community Survey 2010-2012 Public Use Microdata Series
